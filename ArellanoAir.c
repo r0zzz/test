@@ -1,7 +1,7 @@
 /*
     Name: Daniel Roz Arellano
     Date Started: 24/ 09/ 2024
-    Date Finished: 24/ 09/ 2024
+    Date Finished: 27/ 09/ 2024
 
     Airport Sim.
 */
@@ -13,13 +13,13 @@
 #include <windows.h> //-- cannot run on workspace T_T
 
 #define SIZE 6
-#define LANDINGTIME 6
+#define LANDINGTIME 4
 #define LANDINGRATE 5
-#define TAKEOFFTIME 4
+#define TAKEOFFTIME 6
 #define TAKEOFFRATE 6
 
 typedef struct {
-    int flightNum[3];
+    int flightNum[SIZE];
     int front;
     int rear;
 } QUEUE;
@@ -34,9 +34,8 @@ bool isEmpty(int, int);
 int main(void) {
     srand(time(NULL));
 
-    QUEUE landing;
-    QUEUE takeOff;
-    int firstRand, secondRand;
+    QUEUE landing, takeOff;
+    int firstRand, secondRand, flightNum;
     bool empty;
     
     landing = createQueue();
@@ -51,37 +50,31 @@ int main(void) {
     // prioritize landing queue
     empty = isEmpty(landing.front, landing.rear);
     while(!empty) {
-        printf("Landing - %d\n", deQueue(&landing));
+        flightNum = deQueue(&landing);
+        printf("Landing - %d\n", flightNum);
         generatePlane(&landing, &takeOff);
         empty = isEmpty(landing.front, landing.rear);
-        sleep(LANDINGTIME*(100));
+        Sleep(LANDINGTIME*(1000));
     }
     // takeoff queue
     empty = isEmpty(takeOff.front, takeOff.rear);
     while (!empty) {
-        deQueue(&takeOff);
-        printf("Take off - %d\n", deQueue(&takeOff));
+        flightNum = deQueue(&takeOff);
+        printf("Take off - %d\n", flightNum);
         generatePlane(&landing, &takeOff);
+        Sleep(TAKEOFFTIME*(1000));
 
         // check if landing queue is empty
         empty = isEmpty(landing.front, landing.rear);
         while(!empty) {
-            printf("Landing - %d\n", deQueue(&landing));
+            flightNum = deQueue(&landing);
+            printf("Landing - %d\n", flightNum);
             generatePlane(&landing, &takeOff);
             empty = isEmpty(landing.front, landing.rear);
-            sleep(LANDINGTIME*(100));
+            Sleep(LANDINGTIME*(1000));
         }
         empty = isEmpty(takeOff.front, takeOff.rear);
-        sleep(TAKEOFFTIME*(100));
     }
-    empty = isEmpty(landing.front, landing.rear);
-    if(empty)
-        printf("\nlanding is empty");
-        
-    
-    empty = isEmpty(takeOff.front, takeOff.rear);
-    if(empty)
-        printf("\ntake off is empty");
 }
 void generatePlane(QUEUE *landing, QUEUE *takeOff) {
     // generate new flight
